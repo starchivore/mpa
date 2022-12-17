@@ -40,15 +40,4 @@ option('zimg', type: 'feature', value: 'disabled', description: 'libzimg support
 option('zlib', type: 'feature', value: 'disabled', description: 'zlib')
 
 # audio output features
-option('alsa', type: 'feature', value: 'disabled', description: 'ALSA audio output')
-option('audiounit', type: 'feature', value: 'disabled', description: 'AudioUnit output for iOS')
-option('coreaudio', type: 'feature', value: 'disabled', description: 'CoreAudio audio output')
-option('jack', type: 'feature', value: 'disabled', description: 'JACK audio output')
-option('openal', type: 'feature', value: 'disabled', description: 'OpenAL audio output')
-option('opensles', type: 'feature', value: 'disabled', description: 'OpenSL ES audio output')
-option('oss-audio', type: 'feature', value: 'disabled', description: 'OSSv4 audio output')
-option('pipewire', type: 'feature', value: 'disabled', description: 'PipeWire audio output')
-option('pulse', type: 'feature', value: 'disabled', description: 'PulseAudio audio output')
-option('sdl2-audio', type: 'feature', value: 'disabled', description: 'SDL2 audio output')
-option('sndio', type: 'feature', value: 'disabled', description: 'sndio audio output')
 option('wasapi', type: 'feature', value: 'auto', description: 'WASAPI audio output')
