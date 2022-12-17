@@ -126,7 +126,6 @@ if [ "$1" = "meson" ]; then
     meson setup build --cross-file "$prefix_dir/crossfile" \
         --buildtype debugoptimized \
         -D{libmpv,tests}=false -Dlua=luajit \
-        -D{shaderc,spirv-cross,d3d11,libplacebo}=disabled
 
     ninja -C build --verbose
 elif [ "$1" = "waf" ]; then
