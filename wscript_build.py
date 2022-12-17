@@ -1,48 +1,6 @@
 import re
 import os
 
-def _add_rst_manual_dependencies(ctx):
-    manpage_sources_basenames = """
-        options.rst ao.rst vo.rst af.rst vf.rst encode.rst
-        input.rst osc.rst stats.rst lua.rst ipc.rst changes.rst""".split()
-
-    manpage_sources = ['DOCS/man/'+x for x in manpage_sources_basenames]
-
-    for manpage_source in manpage_sources:
-        ctx.add_manual_dependency(
-            ctx.path.find_node('DOCS/man/mpv.rst'),
-            ctx.path.find_node(manpage_source))
-
-def _build_html(ctx):
-    ctx(
-        name         = 'rst2html',
-        target       = 'DOCS/man/mpv.html',
-        source       = 'DOCS/man/mpv.rst',
-        rule         = '${RST2HTML} ${SRC} ${TGT}',
-        install_path = ctx.env.HTMLDIR)
-
-    _add_rst_manual_dependencies(ctx)
-
-def _build_man(ctx):
-    ctx(
-        name         = 'rst2man',
-        target       = 'DOCS/man/mpv.1',
-        source       = 'DOCS/man/mpv.rst',
-        rule         = '${RST2MAN} --strip-elements-with-class=contents ${SRC} ${TGT}',
-        install_path = ctx.env.MANDIR + '/man1')
-
-    _add_rst_manual_dependencies(ctx)
-
-def _build_pdf(ctx):
-    ctx(
-        name         = 'rst2pdf',
-        target       = 'DOCS/man/mpv.pdf',
-        source       = 'DOCS/man/mpv.rst',
-        rule         = '${RST2PDF} -c -b 1 --repeat-table-rows ${SRC} -o ${TGT}',
-        install_path = ctx.env.DOCDIR)
-
-    _add_rst_manual_dependencies(ctx)
-
 def _all_includes(ctx):
     return [ctx.bldnode.abspath(), ctx.srcnode.abspath()] + \
             ctx.dependencies_includes()
