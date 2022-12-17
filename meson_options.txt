@@ -103,18 +103,3 @@ option('gl-dxinterop-d3d9', type: 'feature', value: 'auto', description: 'OpenGL
 option('ios-gl', type: 'feature', value: 'auto', description: 'iOS OpenGL ES hardware decoding interop support')
 option('rpi-mmal', type: 'feature', value: 'auto', description: 'Raspberry Pi MMAL hwaccel')
 option('videotoolbox-gl', type: 'feature', value: 'auto', description: 'Videotoolbox with OpenGL')
-
-# macOS features
-option('macos-10-11-features', type: 'feature', value: 'auto', description: 'macOS 10.11 SDK Features')
-option('macos-10-12-2-features', type: 'feature', value: 'auto', description: 'macOS 10.12.2 SDK Features')
-option('macos-10-14-features', type: 'feature', value: 'auto', description: 'macOS 10.14 SDK Features')
-option('macos-cocoa-cb', type: 'feature', value: 'auto', description: 'macOS libmpv backend')
-option('macos-media-player', type: 'feature', value: 'auto', description: 'macOS Media Player support')
-option('macos-touchbar', type: 'feature', value: 'auto', description: 'macOS Touch Bar support')
-option('swift-build', type: 'feature', value: 'auto', description: 'macOS Swift build tools')
-option('swift-flags', type: 'string', description: 'Optional Swift compiler flags')
-
-# manpages
-option('html-build', type: 'feature', value: 'disabled', description: 'html manual generation')
-option('manpage-build', type: 'feature', value: 'auto', description: 'manpage generation')
-option('pdf-build', type: 'feature', value: 'disabled', description: 'pdf manual generation')
