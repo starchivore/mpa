@@ -1437,48 +1437,6 @@ if features['videotoolbox-gl']
 endif
 
 
-# manpages
-manpage = 'DOCS/man/mpv.rst'
-rst2man = find_program('rst2man', 'rst2man.py', required: get_option('manpage-build'))
-features += {'manpage-build': rst2man.found()}
-if features['manpage-build']
-    mandir = get_option('mandir')
-    custom_target('manpages',
-        input: manpage,
-        output: 'mpv.1',
-        command: [rst2man, '--strip-elements-with-class=contents', '@INPUT@', '@OUTPUT@'],
-        install: true,
-        install_dir: join_paths(mandir, 'man1')
-    )
-endif
-
-rst2html = find_program('rst2html', required: get_option('html-build'))
-features += {'html-build': rst2html.found()}
-if features['html-build']
-    datadir = get_option('datadir')
-    custom_target('html-manpages',
-        input: manpage,
-        output: 'mpv.html',
-        command: [rst2html, '@INPUT@', '@OUTPUT@'],
-        install: true,
-        install_dir: join_paths(datadir, 'doc', 'mpv')
-    )
-endif
-
-rst2pdf = find_program('rst2pdf', required: get_option('pdf-build'))
-features += {'pdf-build': rst2pdf.found()}
-if features['pdf-build']
-    datadir = get_option('datadir')
-    custom_target('pdf-manpages',
-        input: manpage,
-        output: 'mpv.pdf',
-        command: [rst2pdf, '-c', '-b', '1', '--repeat-table-rows', '@INPUT@', '-o', '@OUTPUT@'],
-        install: true,
-        install_dir: join_paths(datadir, 'doc', 'mpv')
-    )
-endif
-
-
 # Currently, we can't easily get every single thing a user might have passed
 # on the cli, but we might as well just hardcode a few options (even if they are
 # not specifically set) for verbosity's sake.
