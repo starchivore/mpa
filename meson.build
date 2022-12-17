@@ -942,5 +942,5 @@ if get_option('cplayer')
 endif
 
 summary({'libmpv': get_option('libmpv'),
-         'lua': features['lua'],
+         'lua': features['lua']},
          bool_yn: true)
