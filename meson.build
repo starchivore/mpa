@@ -504,39 +504,6 @@ if features['av-channel-layout']
     sources += files('audio/chmap_avchannel.c')
 endif
 
-cdda_opt = get_option('cdda').require(
-    get_option('gpl'),
-    error_message: 'the build is not GPL!',
-)
-cdda = dependency('libcdio_paranoia', required: cdda_opt)
-features += {'cdda': cdda.found()}
-if features['cdda']
-    dependencies += cdda
-    sources += files('stream/stream_cdda.c')
-endif
-
-dvbin = get_option('dvbin').require(
-    get_option('gpl'),
-    error_message: 'the build is not GPL!',
-)
-features += {'dvbin': dvbin.allowed()}
-if features['dvbin']
-    sources += files('stream/dvb_tune.c',
-                     'stream/stream_dvb.c')
-endif
-
-dvdnav_opt = get_option('dvdnav').require(
-    get_option('gpl'),
-    error_message: 'the build is not GPL!',
-)
-dvdnav = dependency('dvdnav', version: '>= 4.2.0', required: dvdnav_opt)
-dvdread = dependency('dvdread', version: '>= 4.1.0', required: dvdnav_opt)
-features += {'dvdnav': dvdnav.found() and dvdread.found()}
-if features['dvdnav']
-    dependencies += [dvdnav, dvdread]
-    sources += files('stream/stream_dvdnav.c')
-endif
-
 iconv = dependency('iconv', required: get_option('iconv'))
 features += {'iconv': iconv.found()}
 if features['iconv']
