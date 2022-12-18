@@ -103,7 +103,16 @@ if [ "$1" = "meson" ]; then
 
     ninja -C build --verbose
 elif [ "$1" = "waf" ]; then
-    PKG_CONFIG=pkg-config ./waf configure
+    PKG_CONFIG=pkg-config ./waf configure \
+        --disable-libarchive \
+        --disable-libbluray \
+        --disable-rubberband \
+        --disable-vapoursynth \
+        --disable-pulse \
+        --disable-jack \
+        --disable-opensles \
+        --disable-xv \
+        --disable-caca
 
     ./waf build --verbose
 fi
