@@ -65,16 +65,6 @@ function gettar () {
     tar -xaf "$name"
 }
 
-## iconv
-if [ ! -e "$prefix_dir/lib/libiconv.dll.a" ]; then
-    ver=1.17
-    gettar "https://ftp.gnu.org/pub/gnu/libiconv/libiconv-${ver}.tar.gz"
-    builddir libiconv-${ver}
-    ../configure --host=$TARGET $commonflags
-    makeplusinstall
-    popd
-fi
-
 ## ffmpeg
 if [ ! -e "$prefix_dir/lib/libavcodec.dll.a" ]; then
     [ -d ffmpeg ] || $gitclone https://github.com/FFmpeg/FFmpeg.git ffmpeg
@@ -83,27 +73,6 @@ if [ ! -e "$prefix_dir/lib/libavcodec.dll.a" ]; then
         --enable-cross-compile --cross-prefix=$TARGET- --arch=${TARGET%%-*} \
         $commonflags \
         --disable-{doc,programs,muxers,encoders,devices}
-    makeplusinstall
-    popd
-fi
-
-## freetype2
-if [ ! -e "$prefix_dir/lib/libfreetype.dll.a" ]; then
-    ver=2.12.1
-    gettar "https://download.savannah.gnu.org/releases/freetype/freetype-${ver}.tar.xz"
-    builddir freetype-${ver}
-    meson .. --cross-file "$prefix_dir/crossfile"
-    makeplusinstall
-    popd
-fi
-
-## fribidi
-if [ ! -e "$prefix_dir/lib/libfribidi.dll.a" ]; then
-    ver=1.0.12
-    gettar "https://github.com/fribidi/fribidi/releases/download/v${ver}/fribidi-${ver}.tar.xz"
-    builddir fribidi-${ver}
-    meson .. --cross-file "$prefix_dir/crossfile" \
-        -D{tests,docs}=false
     makeplusinstall
     popd
 fi
