@@ -720,8 +720,6 @@ features += {'libmpv-' + get_option('default_library'): get_option('libmpv')}
 # Set config.h
 conf_data = configuration_data()
 conf_data.set_quoted('CONFIGURATION', configuration)
-conf_data.set_quoted('DEFAULT_DVD_DEVICE', dvd_device)
-conf_data.set_quoted('DEFAULT_CDROM_DEVICE', cd_device)
 
 # Loop over all features in the build, create a define and add them to config.h
 feature_keys = []
