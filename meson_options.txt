@@ -23,7 +23,7 @@ option('lua',
     type: 'combo',
     choices: ['lua', 'lua52', 'lua5.2', 'lua-5.2', 'luajit', 'lua51',
               'lua5.1', 'lua-5.1', 'auto', 'enabled', 'disabled'],
-    value: 'auto',
+    value: 'disabled',
     description: 'Lua'
 )
 option('pthread-debug', type: 'feature', value: 'disabled', description: 'pthread runtime debugging wrappers')
@@ -31,7 +31,7 @@ option('rubberband', type: 'feature', value: 'disabled', description: 'librubber
 option('sdl2', type: 'feature', value: 'disabled', description: 'SDL2')
 option('sdl2-gamepad', type: 'feature', value: 'disabled', description: 'SDL2 gamepad input')
 option('stdatomic', type: 'feature', value: 'disabled', description: 'C11 stdatomic.h')
-option('uchardet', type: 'feature', value: 'disabled', description: 'uchardet support')
+option('uchardet', type: 'feature', value: 'auto', description: 'uchardet support')
 option('uwp', type: 'feature', value: 'disabled', description: 'Universal Windows Platform')
 option('vapoursynth', type: 'feature', value: 'disabled', description: 'VapourSynth filter bridge')
 option('vector', type: 'feature', value: 'disabled', description: 'GCC vector instructions')
