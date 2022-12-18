@@ -525,25 +525,10 @@ if features['lcms2']
     dependencies += lcms2
 endif
 
-libarchive = dependency('libarchive', version: '>= 3.4.0', required: get_option('libarchive'))
-features += {'libarchive': libarchive.found()}
-if features['libarchive']
-    dependencies += libarchive
-    sources += files('demux/demux_libarchive.c',
-                     'stream/stream_libarchive.c')
-endif
-
 libavdevice = dependency('libavdevice', version: '>= 58.13.100', required: get_option('libavdevice'))
 features += {'libavdevice': libavdevice.found()}
 if features['libavdevice']
     dependencies += libavdevice
-endif
-
-libbluray = dependency('libbluray', version: '>= 0.3.0', required: get_option('libbluray'))
-features += {'libbluray': libbluray.found()}
-if features['libbluray']
-    dependencies += libbluray
-    sources += files('stream/stream_bluray.c')
 endif
 
 libm = cc.find_library('m', required: false)
@@ -556,14 +541,6 @@ librt = cc.find_library('rt', required: false)
 features += {'librt': librt.found()}
 if features['librt']
     dependencies += librt
-endif
-
-rubberband = dependency('rubberband', version: '>= 1.8.0', required: get_option('rubberband'))
-features += {'rubberband': rubberband.found()}
-features += {'rubberband-3': rubberband.version().version_compare('>= 3.0.0')}
-if features['rubberband']
-    dependencies += rubberband
-    sources += files('audio/filter/af_rubberband.c')
 endif
 
 sdl2 = dependency('sdl2', required: get_option('sdl2'))
