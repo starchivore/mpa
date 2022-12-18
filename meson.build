@@ -388,27 +388,6 @@ add_project_link_arguments(link_flags, language: ['c', 'objc'])
 
 
 # osdep
-features += {'android': host_machine.system() == 'android'}
-if features['android']
-    dependencies += cc.find_library('android')
-    sources += files('audio/out/ao_audiotrack.c',
-                     'misc/jni.c',
-                     'osdep/android/strnlen.c',
-                     'video/out/android_common.c',
-                     'video/out/vo_mediacodec_embed.c')
-endif
-
-uwp_opt = get_option('uwp').require(
-    not get_option('cplayer'),
-    error_message: 'cplayer is not false!',
-)
-uwp = cc.find_library('windowsapp', required: uwp_opt)
-features += {'uwp': uwp.found()}
-if features['uwp']
-    dependencies += uwp
-    sources += files('osdep/path-uwp.c')
-endif
-
 features += {'win32-executable': win32 and get_option('cplayer')}
 if win32
     sources += files('osdep/timer-win2.c',
@@ -459,22 +438,6 @@ fragments = join_paths(source_root, 'waftools', 'fragments')
 
 features += {'glibc-thread-name': cc.compiles(files(join_paths(fragments, 'glibc_thread_name.c')),
                                               name: 'glibc-thread-name check') and posix}
-
-features += {'osx-thread-name': false}
-if not features['glibc-thread-name']
-    features += {'osx-thread-name': cc.compiles(files(join_paths(fragments, 'osx_thread_name.c')),
-                                                name: 'osx-thread-name check')}
-endif
-
-features += {'bsd-thread-name': false}
-if not features['osx-thread-name'] and not features['glibc-thread-name']
-    features += {'bsd-thread-name': cc.compiles(files(join_paths(fragments, 'bsd_thread_name.c')),
-                                                name: 'bsd-thread-name check')}
-endif
-
-features += {'bsd-fstatfs': cc.has_function('fstatfs', prefix: '#include <sys/mount.h>\n#include <sys/param.h>')}
-
-features += {'linux-fstatfs': cc.has_function('fstatfs', prefix: '#include <sys/vfs.h>')}
 
 vector = get_option('vector').require(
     cc.compiles(files(join_paths(fragments, 'vector.c')), name: 'vector check'),
