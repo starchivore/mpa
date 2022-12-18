@@ -1555,13 +1555,6 @@ if get_option('cplayer')
                include_directories: includedir, install: true)
 endif
 
-summary({'d3d11': features['d3d11'],
-         'gpu-next': features['libplacebo-next'],
-         'javascript': features['javascript'],
-         'libmpv': get_option('libmpv'),
-         'lua': features['lua'],
-         'opengl': features['gl'],
-         'vulkan': features['vulkan'],
-         'wayland': features['wayland'],
-         'x11': features['x11']},
+summary({'libmpv': get_option('libmpv'),
+         'lua': features['lua']},
          bool_yn: true)
