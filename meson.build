@@ -176,6 +176,49 @@ sources = files(
     'stream/stream_null.c',
     'stream/stream_slice.c',
 
+    ## Video
+    'video/csputils.c',
+    'video/decode/vd_lavc.c',
+    'video/filter/refqueue.c',
+    'video/filter/vf_format.c',
+    'video/filter/vf_sub.c',
+    'video/fmt-conversion.c',
+    'video/hwdec.c',
+    'video/image_loader.c',
+    'video/image_writer.c',
+    'video/img_format.c',
+    'video/mp_image.c',
+    'video/mp_image_pool.c',
+    'video/out/aspect.c',
+    'video/out/bitmap_packer.c',
+    'video/out/dither.c',
+    'video/out/dr_helper.c',
+    'video/out/filter_kernels.c',
+    'video/out/gpu/context.c',
+    'video/out/gpu/error_diffusion.c',
+    'video/out/gpu/hwdec.c',
+    'video/out/gpu/lcms.c',
+    'video/out/gpu/libmpv_gpu.c',
+    'video/out/gpu/osd.c',
+    'video/out/gpu/ra.c',
+    'video/out/gpu/shader_cache.c',
+    'video/out/gpu/spirv.c',
+    'video/out/gpu/user_shaders.c',
+    'video/out/gpu/utils.c',
+    'video/out/gpu/video.c',
+    'video/out/gpu/video_shaders.c',
+    'video/out/libmpv_sw.c',
+    'video/out/vo.c',
+    'video/out/vo_gpu.c',
+    'video/out/vo_image.c',
+    'video/out/vo_lavc.c',
+    'video/out/vo_libmpv.c',
+    'video/out/vo_null.c',
+    'video/out/vo_tct.c',
+    'video/out/win_state.c',
+    'video/repack.c',
+    'video/sws_utils.c',
+
     ## osdep
     'osdep/io.c',
     'osdep/semaphore_osx.c',
@@ -675,6 +718,34 @@ features += {'uchardet': uchardet.found()}
 if features['uchardet']
     dependencies += uchardet
 endif
+
+vapoursynth = dependency('vapoursynth', version: '>= 24', required: get_option('vapoursynth'))
+vapoursynth_script = dependency('vapoursynth-script', version: '>= 23',
+                                required: get_option('vapoursynth'))
+features += {'vapoursynth': vapoursynth.found() and vapoursynth_script.found()}
+if features['vapoursynth']
+    dependencies += [vapoursynth, vapoursynth_script]
+    sources += files('video/filter/vf_vapoursynth.c')
+endif
+
+zimg = dependency('zimg', version: '>= 2.9', required: get_option('zimg'))
+features += {'zimg': zimg.found()}
+if features['zimg']
+    dependencies += zimg
+    sources += files('video/filter/vf_fingerprint.c',
+                     'video/zimg.c')
+    if features['tests']
+        sources += files('test/repack.c',
+                         'test/scale_zimg.c')
+    endif
+endif
+
+zlib = dependency('zlib', required: get_option('zlib'))
+features += {'zlib': zlib.found()}
+if features['zlib']
+    dependencies += zlib
+endif
+
 
 # audio output dependencies
 wasapi = cc.has_header_symbol('audioclient.h', 'IAudioClient', required: get_option('wasapi'))
