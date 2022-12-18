@@ -75,18 +75,6 @@ if [ ! -e "$prefix_dir/lib/libiconv.dll.a" ]; then
     popd
 fi
 
-## zlib
-if [ ! -e "$prefix_dir/lib/libz.dll.a" ]; then
-    ver=1.2.12
-    gettar "https://zlib.net/fossils/zlib-${ver}.tar.gz"
-    pushd zlib-${ver}
-    make -fwin32/Makefile.gcc clean
-    make -fwin32/Makefile.gcc PREFIX=$TARGET- SHARED_MODE=1 \
-        DESTDIR="$prefix_dir" install \
-        BINARY_PATH=/bin INCLUDE_PATH=/include LIBRARY_PATH=/lib
-    popd
-fi
-
 ## ffmpeg
 if [ ! -e "$prefix_dir/lib/libavcodec.dll.a" ]; then
     [ -d ffmpeg ] || $gitclone https://github.com/FFmpeg/FFmpeg.git ffmpeg
@@ -131,6 +119,16 @@ if [ ! -e "$prefix_dir/lib/libharfbuzz.dll.a" ]; then
     popd
 fi
 
+## libass
+if [ ! -e "$prefix_dir/lib/libass.dll.a" ]; then
+    [ -d libass ] || $gitclone https://github.com/libass/libass.git
+    builddir libass
+    [ -f ../configure ] || (cd .. && ./autogen.sh)
+    ../configure --host=$TARGET $commonflags
+    makeplusinstall
+    popd
+fi
+
 ## luajit
 if [ ! -e "$prefix_dir/lib/libluajit-5.1.a" ]; then
     ver=2.1.0-beta3
@@ -157,7 +155,7 @@ rm -rf build
 if [ "$1" = "meson" ]; then
     meson setup build --cross-file "$prefix_dir/crossfile" \
         --buildtype debugoptimized \
-        -D{libmpv,tests}=true -Dlua=luajit \
+        -D{libmpv,tests}=false -Dlua=luajit \
 
     ninja -C build --verbose
 elif [ "$1" = "waf" ]; then
