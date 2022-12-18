@@ -131,16 +131,6 @@ if [ ! -e "$prefix_dir/lib/libharfbuzz.dll.a" ]; then
     popd
 fi
 
-## libass
-if [ ! -e "$prefix_dir/lib/libass.dll.a" ]; then
-    [ -d libass ] || $gitclone https://github.com/libass/libass.git
-    builddir libass
-    [ -f ../configure ] || (cd .. && ./autogen.sh)
-    ../configure --host=$TARGET $commonflags
-    makeplusinstall
-    popd
-fi
-
 ## luajit
 if [ ! -e "$prefix_dir/lib/libluajit-5.1.a" ]; then
     ver=2.1.0-beta3
