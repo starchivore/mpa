@@ -87,20 +87,6 @@ if [ ! -e "$prefix_dir/lib/libass.dll.a" ]; then
     popd
 fi
 
-## luajit
-if [ ! -e "$prefix_dir/lib/libluajit-5.1.a" ]; then
-    ver=2.1.0-beta3
-    gettar "http://luajit.org/download/LuaJIT-${ver}.tar.gz"
-    pushd LuaJIT-${ver}
-    hostcc=cc
-    [[ "$TARGET" == "i686-"* ]] && hostcc="$hostcc -m32"
-    make TARGET_SYS=Windows clean
-    make TARGET_SYS=Windows HOST_CC="$hostcc" CROSS=$TARGET- \
-        BUILDMODE=static amalg
-    make DESTDIR="$prefix_dir" INSTALL_DEP= FILE_T=luajit.exe install
-    popd
-fi
-
 ## mpv
 
 [ -z "$1" ] && exit 0
@@ -113,11 +99,11 @@ rm -rf build
 if [ "$1" = "meson" ]; then
     meson setup build --cross-file "$prefix_dir/crossfile" \
         --buildtype debugoptimized \
-        -D{libmpv,tests}=false -Dlua=luajit \
+        -D{libmpv,tests}=false
 
     ninja -C build --verbose
 elif [ "$1" = "waf" ]; then
-    PKG_CONFIG=pkg-config ./waf configure --lua=luajit
+    PKG_CONFIG=pkg-config ./waf configure
 
     ./waf build --verbose
 fi
