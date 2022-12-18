@@ -212,7 +212,6 @@ sources = files(
     'video/out/gpu/error_diffusion.c',
     'video/out/gpu/hwdec.c',
     'video/out/gpu/lcms.c',
-    'video/out/gpu/libmpv_gpu.c',
     'video/out/gpu/osd.c',
     'video/out/gpu/ra.c',
     'video/out/gpu/shader_cache.c',
@@ -221,12 +220,10 @@ sources = files(
     'video/out/gpu/utils.c',
     'video/out/gpu/video.c',
     'video/out/gpu/video_shaders.c',
-    'video/out/libmpv_sw.c',
     'video/out/vo.c',
     'video/out/vo_gpu.c',
     'video/out/vo_image.c',
     'video/out/vo_lavc.c',
-    'video/out/vo_libmpv.c',
     'video/out/vo_null.c',
     'video/out/vo_tct.c',
     'video/out/win_state.c',
@@ -708,7 +705,6 @@ configuration = 'meson configure build ' + '-Dprefix=' + get_option('prefix') + 
                 ' -Doptimization=' + get_option('optimization')
 
 features += {'cplayer': get_option('cplayer')}
-features += {'libmpv-' + get_option('default_library'): get_option('libmpv')}
 
 
 # Set config.h
@@ -766,24 +762,6 @@ if win32
 endif
 
 
-if get_option('libmpv')
-    client_h_define = cc.get_define('MPV_CLIENT_API_VERSION', prefix: '#include "libmpv/client.h"',
-                                    include_directories: include_directories('.'))
-    major = client_h_define.split('|')[0].split('<<')[0].strip('() ')
-    minor = client_h_define.split('|')[1].strip('() ')
-    client_api_version = major + '.' + minor + '.0'
-
-    libmpv = library('mpv', sources, dependencies: dependencies, gnu_symbol_visibility: 'hidden',
-                     version: client_api_version, include_directories: includedir, install: true)
-    pkg = import('pkgconfig')
-    pkg.generate(libmpv, version: client_api_version,
-                 description: 'mpv media player client library')
-
-    headers = ['libmpv/client.h', 'libmpv/render.h',
-               'libmpv/render_gl.h', 'libmpv/stream_cb.h']
-    install_headers(headers, subdir: 'mpv')
-endif
-
 if get_option('cplayer')
     datadir = get_option('datadir')
     confdir = get_option('sysconfdir')
@@ -816,6 +794,5 @@ if get_option('cplayer')
                include_directories: includedir, install: true)
 endif
 
-summary({'libmpv': get_option('libmpv'),
-         'lua': features['lua']},
+summary({'lua': features['lua']},
          bool_yn: true)
