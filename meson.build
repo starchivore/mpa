@@ -23,11 +23,13 @@ libavutil = dependency('libavutil', version: '>= 56.70.100')
 libswresample = dependency('libswresample', version: '>= 3.9.100')
 libswscale = dependency('libswscale', version: '>= 5.9.100')
 
+libass = dependency('libass', version: '>= 0.12.2')
 pthreads = dependency('threads')
 
 # the dependency order of libass -> ffmpeg is necessary due to
 # static linking symbol resolution between fontconfig and MinGW
-dependencies = [libavcodec,
+dependencies = [libass,
+                libavcodec,
                 libavfilter,
                 libavformat,
                 libavutil,
@@ -41,7 +43,7 @@ features = {
     'ffmpeg': true,
     'gpl': get_option('gpl'),
     'jpegxl': libavformat.version().version_compare('>= 59.27.100'),
-    'libass': false,
+    'libass': true,
     'threads': true,
 }
 
@@ -175,6 +177,18 @@ sources = files(
     'stream/stream_mf.c',
     'stream/stream_null.c',
     'stream/stream_slice.c',
+
+    ## Subtitles
+    'sub/ass_mp.c',
+    'sub/dec_sub.c',
+    'sub/draw_bmp.c',
+    'sub/filter_sdh.c',
+    'sub/img_convert.c',
+    'sub/lavc_conv.c',
+    'sub/osd.c',
+    'sub/osd_libass.c',
+    'sub/sd_ass.c',
+    'sub/sd_lavc.c',
 
     ## Video
     'video/csputils.c',
@@ -673,12 +687,6 @@ if features['zimg']
         sources += files('test/repack.c',
                          'test/scale_zimg.c')
     endif
-endif
-
-zlib = dependency('zlib', required: get_option('zlib'))
-features += {'zlib': zlib.found()}
-if features['zlib']
-    dependencies += zlib
 endif
 
 
