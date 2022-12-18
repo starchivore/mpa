@@ -190,6 +190,49 @@ sources = files(
     'sub/sd_ass.c',
     'sub/sd_lavc.c',
 
+    ## Video
+    'video/csputils.c',
+    'video/decode/vd_lavc.c',
+    'video/filter/refqueue.c',
+    'video/filter/vf_format.c',
+    'video/filter/vf_sub.c',
+    'video/fmt-conversion.c',
+    'video/hwdec.c',
+    'video/image_loader.c',
+    'video/image_writer.c',
+    'video/img_format.c',
+    'video/mp_image.c',
+    'video/mp_image_pool.c',
+    'video/out/aspect.c',
+    'video/out/bitmap_packer.c',
+    'video/out/dither.c',
+    'video/out/dr_helper.c',
+    'video/out/filter_kernels.c',
+    'video/out/gpu/context.c',
+    'video/out/gpu/error_diffusion.c',
+    'video/out/gpu/hwdec.c',
+    'video/out/gpu/lcms.c',
+    'video/out/gpu/libmpv_gpu.c',
+    'video/out/gpu/osd.c',
+    'video/out/gpu/ra.c',
+    'video/out/gpu/shader_cache.c',
+    'video/out/gpu/spirv.c',
+    'video/out/gpu/user_shaders.c',
+    'video/out/gpu/utils.c',
+    'video/out/gpu/video.c',
+    'video/out/gpu/video_shaders.c',
+    'video/out/libmpv_sw.c',
+    'video/out/vo.c',
+    'video/out/vo_gpu.c',
+    'video/out/vo_image.c',
+    'video/out/vo_lavc.c',
+    'video/out/vo_libmpv.c',
+    'video/out/vo_null.c',
+    'video/out/vo_tct.c',
+    'video/out/win_state.c',
+    'video/repack.c',
+    'video/sws_utils.c',
+
     ## osdep
     'osdep/io.c',
     'osdep/semaphore_osx.c',
@@ -296,6 +339,19 @@ cplugins = get_option('cplugins').require(
 features += {'cplugins': cplugins.allowed()}
 if features['cplugins']
     link_flags += '-rdynamic'
+endif
+
+features += {'tests': get_option('tests')}
+if features['tests']
+    sources += files('test/chmap.c',
+                     'test/gl_video.c',
+                     'test/img_format.c',
+                     'test/json.c',
+                     'test/linked_list.c',
+                     'test/paths.c',
+                     'test/scale_sws.c',
+                     'test/scale_test.c',
+                     'test/tests.c')
 endif
 
 # Note: this include is only used for windows pthreads and
@@ -452,6 +508,41 @@ cdda_opt = get_option('cdda').require(
     get_option('gpl'),
     error_message: 'the build is not GPL!',
 )
+cdda = dependency('libcdio_paranoia', required: cdda_opt)
+features += {'cdda': cdda.found()}
+if features['cdda']
+    dependencies += cdda
+    sources += files('stream/stream_cdda.c')
+endif
+
+dvbin = get_option('dvbin').require(
+    get_option('gpl'),
+    error_message: 'the build is not GPL!',
+)
+features += {'dvbin': dvbin.allowed()}
+if features['dvbin']
+    sources += files('stream/dvb_tune.c',
+                     'stream/stream_dvb.c')
+endif
+
+dvdnav_opt = get_option('dvdnav').require(
+    get_option('gpl'),
+    error_message: 'the build is not GPL!',
+)
+dvdnav = dependency('dvdnav', version: '>= 4.2.0', required: dvdnav_opt)
+dvdread = dependency('dvdread', version: '>= 4.1.0', required: dvdnav_opt)
+features += {'dvdnav': dvdnav.found() and dvdread.found()}
+if features['dvdnav']
+    dependencies += [dvdnav, dvdread]
+    sources += files('stream/stream_dvdnav.c')
+endif
+
+iconv = dependency('iconv', required: get_option('iconv'))
+features += {'iconv': iconv.found()}
+if features['iconv']
+    dependencies += iconv
+endif
+
 javascript = dependency('mujs', version: '>= 1.0.0', required: get_option('javascript'))
 features += {'javascript': javascript.found()}
 if features['javascript']
@@ -617,6 +708,7 @@ configuration = 'meson configure build ' + '-Dprefix=' + get_option('prefix') + 
                 ' -Doptimization=' + get_option('optimization')
 
 features += {'cplayer': get_option('cplayer')}
+features += {'libmpv-' + get_option('default_library'): get_option('libmpv')}
 
 
 # Set config.h
@@ -674,6 +766,24 @@ if win32
 endif
 
 
+if get_option('libmpv')
+    client_h_define = cc.get_define('MPV_CLIENT_API_VERSION', prefix: '#include "libmpv/client.h"',
+                                    include_directories: include_directories('.'))
+    major = client_h_define.split('|')[0].split('<<')[0].strip('() ')
+    minor = client_h_define.split('|')[1].strip('() ')
+    client_api_version = major + '.' + minor + '.0'
+
+    libmpv = library('mpv', sources, dependencies: dependencies, gnu_symbol_visibility: 'hidden',
+                     version: client_api_version, include_directories: includedir, install: true)
+    pkg = import('pkgconfig')
+    pkg.generate(libmpv, version: client_api_version,
+                 description: 'mpv media player client library')
+
+    headers = ['libmpv/client.h', 'libmpv/render.h',
+               'libmpv/render_gl.h', 'libmpv/stream_cb.h']
+    install_headers(headers, subdir: 'mpv')
+endif
+
 if get_option('cplayer')
     datadir = get_option('datadir')
     confdir = get_option('sysconfdir')
@@ -706,5 +816,6 @@ if get_option('cplayer')
                include_directories: includedir, install: true)
 endif
 
-summary({'lua': features['lua']},
+summary({'libmpv': get_option('libmpv'),
+         'lua': features['lua']},
          bool_yn: true)
