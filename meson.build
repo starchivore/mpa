@@ -23,11 +23,13 @@ libavutil = dependency('libavutil', version: '>= 56.70.100')
 libswresample = dependency('libswresample', version: '>= 3.9.100')
 libswscale = dependency('libswscale', version: '>= 5.9.100')
 
+libass = dependency('libass', version: '>= 0.12.2')
 pthreads = dependency('threads')
 
 # the dependency order of libass -> ffmpeg is necessary due to
 # static linking symbol resolution between fontconfig and MinGW
-dependencies = [libavcodec,
+dependencies = [libass,
+                libavcodec,
                 libavfilter,
                 libavformat,
                 libavutil,
@@ -41,7 +43,7 @@ features = {
     'ffmpeg': true,
     'gpl': get_option('gpl'),
     'jpegxl': libavformat.version().version_compare('>= 59.27.100'),
-    'libass': false,
+    'libass': true,
     'threads': true,
 }
 
@@ -175,6 +177,18 @@ sources = files(
     'stream/stream_mf.c',
     'stream/stream_null.c',
     'stream/stream_slice.c',
+
+    ## Subtitles
+    'sub/ass_mp.c',
+    'sub/dec_sub.c',
+    'sub/draw_bmp.c',
+    'sub/filter_sdh.c',
+    'sub/img_convert.c',
+    'sub/lavc_conv.c',
+    'sub/osd.c',
+    'sub/osd_libass.c',
+    'sub/sd_ass.c',
+    'sub/sd_lavc.c',
 
     ## Video
     'video/csputils.c',
@@ -623,25 +637,6 @@ if features['libavdevice']
     dependencies += libavdevice
 endif
 
-libbluray = dependency('libbluray', version: '>= 0.3.0', required: get_option('libbluray'))
-features += {'libbluray': libbluray.found()}
-if features['libbluray']
-    dependencies += libbluray
-    sources += files('stream/stream_bluray.c')
-endif
-
-libm = cc.find_library('m', required: false)
-features += {'libm': libm.found()}
-if features['libm']
-    dependencies += libm
-endif
-
-librt = cc.find_library('rt', required: false)
-features += {'librt': librt.found()}
-if features['librt']
-    dependencies += librt
-endif
-
 lua = dependency('', required: false)
 lua_opt = get_option('lua')
 if lua_opt != 'disabled'
@@ -679,36 +674,6 @@ if not features['lua'] and lua_opt == 'enabled'
      error('lua enabled but no suitable lua version could be found!')
 endif
 
-rubberband = dependency('rubberband', version: '>= 1.8.0', required: get_option('rubberband'))
-features += {'rubberband': rubberband.found()}
-features += {'rubberband-3': rubberband.version().version_compare('>= 3.0.0')}
-if features['rubberband']
-    dependencies += rubberband
-    sources += files('audio/filter/af_rubberband.c')
-endif
-
-sdl2 = dependency('sdl2', required: get_option('sdl2'))
-features += {'sdl2': sdl2.found()}
-if features['sdl2']
-    dependencies += sdl2
-endif
-
-sdl2_gamepad = get_option('sdl2-gamepad').require(
-    features['sdl2'],
-    error_message: 'sdl2 was not found!',
-)
-features += {'sdl2-gamepad': sdl2_gamepad.allowed()}
-if features['sdl2-gamepad']
-    sources += files('input/sdl_gamepad.c')
-endif
-
-stdatomic_dep = cc.find_library('atomic', required: false)
-features += {'stdatomic': cc.has_header_symbol('stdatomic.h', 'atomic_int', dependencies: stdatomic_dep,
-                                               required: get_option('stdatomic'))}
-if features['stdatomic']
-    dependencies += stdatomic_dep
-endif
-
 uchardet_opt = get_option('uchardet').require(
     features['iconv'],
     error_message: 'iconv was not found!',
@@ -717,33 +682,6 @@ uchardet = dependency('uchardet', required: uchardet_opt)
 features += {'uchardet': uchardet.found()}
 if features['uchardet']
     dependencies += uchardet
-endif
-
-vapoursynth = dependency('vapoursynth', version: '>= 24', required: get_option('vapoursynth'))
-vapoursynth_script = dependency('vapoursynth-script', version: '>= 23',
-                                required: get_option('vapoursynth'))
-features += {'vapoursynth': vapoursynth.found() and vapoursynth_script.found()}
-if features['vapoursynth']
-    dependencies += [vapoursynth, vapoursynth_script]
-    sources += files('video/filter/vf_vapoursynth.c')
-endif
-
-zimg = dependency('zimg', version: '>= 2.9', required: get_option('zimg'))
-features += {'zimg': zimg.found()}
-if features['zimg']
-    dependencies += zimg
-    sources += files('video/filter/vf_fingerprint.c',
-                     'video/zimg.c')
-    if features['tests']
-        sources += files('test/repack.c',
-                         'test/scale_zimg.c')
-    endif
-endif
-
-zlib = dependency('zlib', required: get_option('zlib'))
-features += {'zlib': zlib.found()}
-if features['zlib']
-    dependencies += zlib
 endif
 
 
