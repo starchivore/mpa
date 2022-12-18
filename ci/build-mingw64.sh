@@ -104,15 +104,91 @@ if [ "$1" = "meson" ]; then
     ninja -C build --verbose
 elif [ "$1" = "waf" ]; then
     PKG_CONFIG=pkg-config ./waf configure \
-        --disable-libarchive \
+        --disable-android \
+        --disable-android-media-ndk \
+        --disable-tvos \
+        --disable-egl-android \
+        --disable-swift \
+        --disable-uwp \
+        --disable-stdatomic \
+        --disable-iconv \
+        --disable-lua \
+        --disable-javascript \
+        --disable-zlib \
         --disable-libbluray \
+        --disable-dvdnav \
+        --disable-cdda \
+        --disable-uchardet \
         --disable-rubberband \
+        --disable-zimg \
+        --disable-lcms2 \
         --disable-vapoursynth \
+        --disable-libarchive \
+        --disable-dvbin \
+        --disable-sdl2 \
+        --disable-sdl2-gamepad \
+        --disable-sdl2-audio \
+        --disable-oss-audio \
+        --disable-pipewire \
+        --disable-sndio \
         --disable-pulse \
         --disable-jack \
+        --disable-openal \
         --disable-opensles \
+        --disable-alsa \
+        --disable-coreaudio \
+        --disable-audiounit \
+        --disable-sdl2-video \
+        --disable-cocoa \
+        --disable-drm \
+        --disable-gbm \
+        --disable-wayland \
+        --disable-x11 \
         --disable-xv \
-        --disable-caca
+        --disable-gl-cocoa \
+        --disable-gl-x11 \
+        --disable-rpi \
+        --disable-egl \
+        --disable-egl-x11 \
+        --disable-egl-drm \
+        --disable-gl-wayland \
+        --disable-gl-win32 \
+        --disable-gl-dxinterop \
+        --disable-egl-angle \
+        --disable-egl-angle-lib \
+        --disable-egl-angle-win32 \
+        --disable-vdpau \
+        --disable-vdpau-gl-x11 \
+        --disable-vaapi \
+        --disable-vaapi-x11 \
+        --disable-vaapi-wayland \
+        --disable-vaapi-drm \
+        --disable-vaapi-x-egl \
+        --disable-caca \
+        --disable-jpeg \
+        --disable-direct3d \
+        --disable-shaderc \
+        --disable-spirv-cross \
+        --disable-d3d11 \
+        --disable-ios-gl \
+        --disable-plain-gl \
+        --disable-gl \
+        --disable-libplacebo \
+        --disable-vulkan \
+        --disable-sixel \
+        --disable-videotoolbox-gl \
+        --disable-d3d-hwaccel \
+        --disable-d3d9-hwaccel \
+        --disable-gl-dxinterop-d3d9 \
+        --disable-cuda-hwaccel \
+        --disable-cuda-interop \
+        --disable-rpi-mmal \
+        --disable-macos-touchbar \
+        --disable-macos-10-11-features \
+        --disable-macos-10-12-2-features \
+        --disable-macos-10-14-features \
+        --disable-macos-media-player \
+        --disable-macos-cocoa-cb
 
     ./waf build --verbose
 fi
