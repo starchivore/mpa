@@ -65,28 +65,6 @@ function gettar () {
     tar -xaf "$name"
 }
 
-## iconv
-if [ ! -e "$prefix_dir/lib/libiconv.dll.a" ]; then
-    ver=1.17
-    gettar "https://ftp.gnu.org/pub/gnu/libiconv/libiconv-${ver}.tar.gz"
-    builddir libiconv-${ver}
-    ../configure --host=$TARGET $commonflags
-    makeplusinstall
-    popd
-fi
-
-## zlib
-if [ ! -e "$prefix_dir/lib/libz.dll.a" ]; then
-    ver=1.2.12
-    gettar "https://zlib.net/fossils/zlib-${ver}.tar.gz"
-    pushd zlib-${ver}
-    make -fwin32/Makefile.gcc clean
-    make -fwin32/Makefile.gcc PREFIX=$TARGET- SHARED_MODE=1 \
-        DESTDIR="$prefix_dir" install \
-        BINARY_PATH=/bin INCLUDE_PATH=/include LIBRARY_PATH=/lib
-    popd
-fi
-
 ## ffmpeg
 if [ ! -e "$prefix_dir/lib/libavcodec.dll.a" ]; then
     [ -d ffmpeg ] || $gitclone https://github.com/FFmpeg/FFmpeg.git ffmpeg
