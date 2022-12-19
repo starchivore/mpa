@@ -204,12 +204,6 @@ if [ "$1" = "meson" ]; then
         -D{cdda,cplugins,dvbin,dvdnav,iconv,javascript,lcms2,libarchive,libavdevice,libbluray,pthread-debug,rubberband,sdl2,sdl2-gamepad,stdatomic,uchardet,uwp,vapoursynth,vector,win32-internal-pthreads,zimg,zlib,alsa,audiounit,coreaudio,jack,openal,opensles,oss-audio,pipewire,pulse,sdl2-audio,sndio,caca,cocoa,d3d11,direct3d,drm,egl,egl-android,egl-angle,egl-angle-lib,egl-angle-win32,egl-drm,egl-wayland,egl-x11,gbm,gl,gl-cocoa,gl-dxinterop,gl-win32,gl-x11,jpeg,libplacebo,rpi,sdl2-video,shaderc,sixel,spirv-cross,plain-gl,vdpau,vdpau-gl-x11,vaapi,vaapi-drm,vaapi-wayland,vaapi-x11,vaapi-x-egl,vulkan,wayland,x11,xv,android-media-ndk,cuda-hwaccel,cuda-interop,d3d-hwaccel,d3d9-hwaccel,gl-dxinterop-d3d9,ios-gl,rpi-mmal,videotoolbox-gl,macos-10-11-features,macos-10-12-2-features,macos-10-14-features,macos-cocoa-cb,macos-media-player,macos-touchbar,swift-build,swift-flags,html-build,manpage-build,pdf-build}=disabled
 
     ninja -C build --verbose
-elif [ "$1" = "waf" ]; then
-    PKG_CONFIG=pkg-config ./waf configure \
-        --enable-libmpv-shared --lua=luajit \
-        --enable-{shaderc,spirv-cross,d3d11,libplacebo,tests}
-
-    ./waf build --verbose
 fi
 
 if [ "$2" = pack ]; then
