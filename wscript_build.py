@@ -1,6 +1,48 @@
 import re
 import os
 
+def _add_rst_manual_dependencies(ctx):
+    manpage_sources_basenames = """
+        options.rst ao.rst vo.rst af.rst vf.rst encode.rst
+        input.rst osc.rst stats.rst lua.rst ipc.rst changes.rst""".split()
+
+    manpage_sources = ['DOCS/man/'+x for x in manpage_sources_basenames]
+
+    for manpage_source in manpage_sources:
+        ctx.add_manual_dependency(
+            ctx.path.find_node('DOCS/man/mpv.rst'),
+            ctx.path.find_node(manpage_source))
+
+def _build_html(ctx):
+    ctx(
+        name         = 'rst2html',
+        target       = 'DOCS/man/mpv.html',
+        source       = 'DOCS/man/mpv.rst',
+        rule         = '${RST2HTML} ${SRC} ${TGT}',
+        install_path = ctx.env.HTMLDIR)
+
+    _add_rst_manual_dependencies(ctx)
+
+def _build_man(ctx):
+    ctx(
+        name         = 'rst2man',
+        target       = 'DOCS/man/mpv.1',
+        source       = 'DOCS/man/mpv.rst',
+        rule         = '${RST2MAN} --strip-elements-with-class=contents ${SRC} ${TGT}',
+        install_path = ctx.env.MANDIR + '/man1')
+
+    _add_rst_manual_dependencies(ctx)
+
+def _build_pdf(ctx):
+    ctx(
+        name         = 'rst2pdf',
+        target       = 'DOCS/man/mpv.pdf',
+        source       = 'DOCS/man/mpv.rst',
+        rule         = '${RST2PDF} -c -b 1 --repeat-table-rows ${SRC} -o ${TGT}',
+        install_path = ctx.env.DOCDIR)
+
+    _add_rst_manual_dependencies(ctx)
+
 def _all_includes(ctx):
     return [ctx.bldnode.abspath(), ctx.srcnode.abspath()] + \
             ctx.dependencies_includes()
@@ -169,6 +211,7 @@ def build(ctx):
 
     if ctx.dependency_satisfied('cplayer'):
         main_fn_c = ctx.pick_first_matching_dep([
+            ( "osdep/main-fn-cocoa.c",               "cocoa" ),
             ( "osdep/main-fn-unix.c",                "posix" ),
             ( "osdep/main-fn-win.c",                 "win32-desktop" ),
         ])
@@ -181,6 +224,7 @@ def build(ctx):
 
     timer_c = ctx.pick_first_matching_dep([
         ( "osdep/timer-win2.c",                  "os-win32" ),
+        ( "osdep/timer-darwin.c",                "os-darwin" ),
         ( "osdep/timer-linux.c",                 "posix" ),
     ])
 
@@ -204,12 +248,35 @@ def build(ctx):
         ( "audio/chmap_sel.c" ),
         ( "audio/decode/ad_lavc.c" ),
         ( "audio/decode/ad_spdif.c" ),
+        ( "audio/filter/af_drop.c" ),
+        ( "audio/filter/af_format.c" ),
+        ( "audio/filter/af_lavcac3enc.c" ),
+        ( "audio/filter/af_rubberband.c",        "rubberband" ),
+        ( "audio/filter/af_scaletempo.c" ),
+        ( "audio/filter/af_scaletempo2.c" ),
+        ( "audio/filter/af_scaletempo2_internals.c" ),
         ( "audio/fmt-conversion.c" ),
         ( "audio/format.c" ),
         ( "audio/out/ao.c" ),
+        ( "audio/out/ao_alsa.c",                 "alsa" ),
+        ( "audio/out/ao_audiotrack.c",           "android" ),
+        ( "audio/out/ao_audiounit.m",            "audiounit" ),
+        ( "audio/out/ao_coreaudio.c",            "coreaudio" ),
+        ( "audio/out/ao_coreaudio_chmap.c",      "coreaudio || audiounit" ),
+        ( "audio/out/ao_coreaudio_exclusive.c",  "coreaudio" ),
+        ( "audio/out/ao_coreaudio_properties.c", "coreaudio" ),
+        ( "audio/out/ao_coreaudio_utils.c",      "coreaudio || audiounit" ),
+        ( "audio/out/ao_jack.c",                 "jack" ),
         ( "audio/out/ao_lavc.c" ),
         ( "audio/out/ao_null.c" ),
+        ( "audio/out/ao_openal.c",               "openal" ),
+        ( "audio/out/ao_opensles.c",             "opensles" ),
+        ( "audio/out/ao_oss.c",                  "oss-audio" ),
         ( "audio/out/ao_pcm.c" ),
+        ( "audio/out/ao_pipewire.c",             "pipewire" ),
+        ( "audio/out/ao_pulse.c",                "pulse" ),
+        ( "audio/out/ao_sdl.c",                  "sdl2-audio" ),
+        ( "audio/out/ao_sndio.c",                "sndio" ),
         ( "audio/out/ao_wasapi.c",               "wasapi" ),
         ( "audio/out/ao_wasapi_changenotify.c",  "wasapi" ),
         ( "audio/out/ao_wasapi_utils.c",         "wasapi" ),
@@ -237,6 +304,7 @@ def build(ctx):
         ( "demux/demux_disc.c" ),
         ( "demux/demux_edl.c" ),
         ( "demux/demux_lavf.c" ),
+        ( "demux/demux_libarchive.c",            "libarchive" ),
         ( "demux/demux_mf.c" ),
         ( "demux/demux_mkv.c" ),
         ( "demux/demux_mkv_timeline.c" ),
@@ -248,6 +316,21 @@ def build(ctx):
         ( "demux/packet.c" ),
         ( "demux/timeline.c" ),
 
+        ( "filters/f_async_queue.c" ),
+        ( "filters/f_autoconvert.c" ),
+        ( "filters/f_auto_filters.c" ),
+        ( "filters/f_decoder_wrapper.c" ),
+        ( "filters/f_demux_in.c" ),
+        ( "filters/f_hwtransfer.c" ),
+        ( "filters/f_lavfi.c" ),
+        ( "filters/f_output_chain.c" ),
+        ( "filters/f_swresample.c" ),
+        ( "filters/f_swscale.c" ),
+        ( "filters/f_utils.c" ),
+        ( "filters/filter.c" ),
+        ( "filters/frame.c" ),
+        ( "filters/user_filters.c" ),
+
         ## Input
         ( "input/cmd.c" ),
         ( "input/event.c" ),
@@ -255,11 +338,13 @@ def build(ctx):
         ( "input/ipc.c" ),
         ( ipc_c ),
         ( "input/keycodes.c" ),
+        ( "input/sdl_gamepad.c",                 "sdl2-gamepad" ),
 
         ## Misc
         ( "misc/bstr.c" ),
         ( "misc/charset_conv.c" ),
         ( "misc/dispatch.c" ),
+        ( "misc/jni.c",                          "android" ),
         ( "misc/json.c" ),
         ( "misc/natural_sort.c" ),
         ( "misc/node.c" ),
@@ -284,7 +369,9 @@ def build(ctx):
         ( "player/command.c" ),
         ( "player/configfiles.c" ),
         ( "player/external_files.c" ),
+        ( "player/javascript.c",                 "javascript" ),
         ( "player/loadfile.c" ),
+        ( "player/lua.c",                        "lua" ),
         ( "player/main.c" ),
         ( "player/misc.c" ),
         ( "player/osd.c" ),
@@ -296,14 +383,20 @@ def build(ctx):
 
         ## Streams
         ( "stream/cookies.c" ),
+        ( "stream/dvb_tune.c",                   "dvbin" ),
         ( "stream/stream.c" ),
         ( "stream/stream_avdevice.c" ),
+        ( "stream/stream_bluray.c",              "libbluray" ),
         ( "stream/stream_cb.c" ),
+        ( "stream/stream_cdda.c",                "cdda" ),
         ( "stream/stream_concat.c" ),
         ( "stream/stream_slice.c" ),
+        ( "stream/stream_dvb.c",                 "dvbin" ),
+        ( "stream/stream_dvdnav.c",              "dvdnav" ),
         ( "stream/stream_edl.c" ),
         ( "stream/stream_file.c" ),
         ( "stream/stream_lavf.c" ),
+        ( "stream/stream_libarchive.c",          "libarchive" ),
         ( "stream/stream_memory.c" ),
         ( "stream/stream_mf.c" ),
         ( "stream/stream_null.c" ),
@@ -337,10 +430,19 @@ def build(ctx):
 
         ## Video
         ( "video/csputils.c" ),
+        ( "video/cuda.c",                        "cuda-hwaccel" ),
+        ( "video/d3d.c",                         "d3d-hwaccel" ),
+        ( "video/drmprime.c",                    "drm" ),
         ( "video/decode/vd_lavc.c" ),
         ( "video/filter/refqueue.c" ),
+        ( "video/filter/vf_d3d11vpp.c",          "d3d-hwaccel" ),
+        ( "video/filter/vf_fingerprint.c",       "zimg" ),
         ( "video/filter/vf_format.c" ),
+        ( "video/filter/vf_gpu.c",               "egl-helpers && gl && egl" ),
         ( "video/filter/vf_sub.c" ),
+        ( "video/filter/vf_vapoursynth.c",       "vapoursynth" ),
+        ( "video/filter/vf_vavpp.c",             "vaapi" ),
+        ( "video/filter/vf_vdpaupp.c",           "vdpau" ),
         ( "video/fmt-conversion.c" ),
         ( "video/hwdec.c" ),
         ( "video/image_loader.c" ),
@@ -348,12 +450,25 @@ def build(ctx):
         ( "video/img_format.c" ),
         ( "video/mp_image.c" ),
         ( "video/mp_image_pool.c" ),
+        ( "video/out/android_common.c",          "android" ),
         ( "video/out/aspect.c" ),
         ( "video/out/bitmap_packer.c" ),
+        ( "video/out/cocoa/events_view.m",       "cocoa" ),
+        ( "video/out/cocoa/video_view.m",        "cocoa" ),
+        ( "video/out/cocoa/window.m",            "cocoa" ),
+        ( "video/out/cocoa_common.m",            "cocoa" ),
+        ( "video/out/d3d11/context.c",           "d3d11" ),
+        ( "video/out/d3d11/hwdec_d3d11va.c",     "d3d11 && d3d-hwaccel" ),
+        ( "video/out/d3d11/hwdec_dxva2dxgi.c",   "d3d11 && d3d9-hwaccel" ),
+        ( "video/out/d3d11/ra_d3d11.c",          "d3d11" ),
         ( "video/out/dither.c" ),
         ( "video/out/dr_helper.c" ),
+        ( "video/out/drm_atomic.c",              "drm" ),
+        ( "video/out/drm_common.c",              "drm" ),
+        ( "video/out/drm_prime.c",               "drm" ),
         ( "video/out/filter_kernels.c" ),
         ( "video/out/gpu/context.c" ),
+        ( "video/out/gpu/d3d11_helpers.c",       "d3d11 || egl-angle-win32" ),
         ( "video/out/gpu/error_diffusion.c" ),
         ( "video/out/gpu/hwdec.c" ),
         ( "video/out/gpu/lcms.c" ),
@@ -362,24 +477,102 @@ def build(ctx):
         ( "video/out/gpu/ra.c" ),
         ( "video/out/gpu/shader_cache.c" ),
         ( "video/out/gpu/spirv.c" ),
+        ( "video/out/gpu/spirv_shaderc.c",       "shaderc" ),
         ( "video/out/gpu/user_shaders.c" ),
         ( "video/out/gpu/utils.c" ),
         ( "video/out/gpu/video.c" ),
         ( "video/out/gpu/video_shaders.c" ),
+        ( "video/out/gpu_next/context.c",        "libplacebo-next" ),
+        ( "video/out/hwdec/hwdec_aimagereader.c", "android-media-ndk" ),
+        ( "video/out/hwdec/hwdec_cuda.c",        "cuda-interop" ),
+        ( "video/out/hwdec/hwdec_cuda_gl.c",     "cuda-interop && gl" ),
+        ( "video/out/hwdec/hwdec_cuda_vk.c",     "cuda-interop && vulkan" ),
+        ( "video/out/hwdec/hwdec_drmprime.c",    "drm" ),
+        ( "video/out/hwdec/hwdec_drmprime_overlay.c","drm" ),
+        ( "video/out/hwdec/hwdec_vaapi.c",       "vaapi-egl || vaapi-libplacebo" ),
+        ( "video/out/hwdec/dmabuf_interop_gl.c", "dmabuf-interop-gl" ),
+        ( "video/out/hwdec/dmabuf_interop_pl.c", "dmabuf-interop-pl" ),
+        ( "video/out/hwdec/dmabuf_interop_wl.c", "dmabuf-wayland" ),
         ( "video/out/libmpv_sw.c" ),
+        ( "video/out/placebo/ra_pl.c",           "libplacebo" ),
+        ( "video/out/placebo/utils.c",           "libplacebo" ),
+        ( "video/out/opengl/angle_dynamic.c",    "egl-angle" ),
+        ( "video/out/opengl/common.c",           "gl" ),
+        ( "video/out/opengl/context.c",          "gl" ),
+        ( "video/out/opengl/context_android.c",  "egl-android" ),
+        ( "video/out/opengl/context_angle.c",    "egl-angle-win32" ),
+        ( "video/out/opengl/context_cocoa.c",    "gl-cocoa" ),
+        ( "video/out/opengl/context_drm_egl.c",  "egl-drm" ),
+        ( "video/out/opengl/context_dxinterop.c","gl-dxinterop" ),
+        ( "video/out/opengl/context_glx.c",      "gl-x11" ),
+        ( "video/out/opengl/context_rpi.c",      "rpi" ),
+        ( "video/out/opengl/context_wayland.c",  "gl-wayland" ),
+        ( "video/out/opengl/context_win.c",      "gl-win32" ),
+        ( "video/out/opengl/context_x11egl.c",   "egl-x11" ),
+        ( "video/out/opengl/egl_helpers.c",      "egl-helpers" ),
+        ( "video/out/opengl/formats.c",          "gl" ),
+        ( "video/out/opengl/hwdec_d3d11egl.c",   "d3d-hwaccel && egl-angle" ),
+        ( "video/out/opengl/hwdec_dxva2egl.c",   "d3d9-hwaccel && egl-angle" ),
+        ( "video/out/opengl/hwdec_dxva2gldx.c",  "gl-dxinterop-d3d9" ),
+        ( "video/out/opengl/hwdec_ios.m",        "ios-gl" ),
+        ( "video/out/opengl/hwdec_osx.c",        "videotoolbox-gl" ),
+        ( "video/out/opengl/hwdec_rpi.c",        "rpi-mmal" ),
+        ( "video/out/opengl/hwdec_vdpau.c",      "vdpau-gl-x11" ),
+        ( "video/out/opengl/libmpv_gl.c",        "gl" ),
+        ( "video/out/opengl/ra_gl.c",            "gl" ),
+        ( "video/out/opengl/utils.c",            "gl" ),
+        ( "video/out/present_sync.c",            "wayland || x11" ),
+        ( "video/out/wldmabuf/context_wldmabuf.c", "dmabuf-wayland" ),
+        ( "video/out/wldmabuf/ra_wldmabuf.c",      "dmabuf-wayland" ),
+        ( "video/out/wlbuf_pool.c",                "dmabuf-wayland" ),
         ( "video/out/vo.c" ),
+        ( "video/out/vo_caca.c",                 "caca" ),
+        ( "video/out/vo_direct3d.c",             "direct3d" ),
+        ( "video/out/vo_drm.c",                  "drm" ),
         ( "video/out/vo_gpu.c" ),
+        ( "video/out/vo_gpu_next.c",             "libplacebo-next" ),
         ( "video/out/vo_image.c" ),
         ( "video/out/vo_lavc.c" ),
         ( "video/out/vo_libmpv.c" ),
+        ( "video/out/vo_mediacodec_embed.c",     "android" ),
         ( "video/out/vo_null.c" ),
+        ( "video/out/vo_rpi.c",                  "rpi-mmal" ),
+        ( "video/out/vo_sdl.c",                  "sdl2-video" ),
+        ( "video/out/vo_sixel.c",                "sixel" ),
         ( "video/out/vo_tct.c" ),
+        ( "video/out/vo_vaapi.c",                "vaapi-x11 && gpl" ),
+        ( "video/out/vo_dmabuf_wayland.c",       "dmabuf-wayland"  ),
+        ( "video/out/vo_vdpau.c",                "vdpau" ),
+        ( "video/out/vo_wlshm.c",                "wayland && memfd_create" ),
+        ( "video/out/vo_x11.c" ,                 "x11" ),
+        ( "video/out/vo_xv.c",                   "xv" ),
+        ( "video/out/vulkan/context.c",          "vulkan" ),
+        ( "video/out/vulkan/context_display.c",  "vulkan" ),
+        ( "video/out/vulkan/context_android.c",  "vulkan && android" ),
+        ( "video/out/vulkan/context_wayland.c",  "vulkan && wayland" ),
+        ( "video/out/vulkan/context_win.c",      "vulkan && win32-desktop" ),
+        ( "video/out/vulkan/context_xlib.c",     "vulkan && x11" ),
+        ( "video/out/vulkan/utils.c",            "vulkan" ),
         ( "video/out/w32_common.c",              "win32-desktop" ),
+        ( "generated/wayland/single-pixel-buffer-v1.c", "wayland-protocols-1-27" ),
+        ( "generated/wayland/content-type-v1.c", "wayland-protocols-1-27" ),
+        ( "generated/wayland/idle-inhibit-unstable-v1.c", "wayland" ),
+        ( "generated/wayland/presentation-time.c", "wayland" ),
+        ( "generated/wayland/xdg-decoration-unstable-v1.c", "wayland" ),
+        ( "generated/wayland/xdg-shell.c",       "wayland" ),
+        ( "generated/wayland/linux-dmabuf-unstable-v1.c", "wayland" ),
+        ( "generated/wayland/viewporter.c", "wayland" ),
+        ( "video/out/wayland_common.c",          "wayland" ),
         ( "video/out/win32/displayconfig.c",     "win32-desktop" ),
         ( "video/out/win32/droptarget.c",        "win32-desktop" ),
         ( "video/out/win_state.c"),
+        ( "video/out/x11_common.c",              "x11" ),
         ( "video/repack.c" ),
         ( "video/sws_utils.c" ),
+        ( "video/zimg.c",                        "zimg" ),
+        ( "video/vaapi.c",                       "vaapi" ),
+        ( "video/vdpau.c",                       "vdpau" ),
+        ( "video/vdpau_mixer.c",                 "vdpau" ),
 
         ## osdep
         ( getch2_c ),
