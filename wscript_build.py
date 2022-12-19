@@ -169,7 +169,6 @@ def build(ctx):
 
     if ctx.dependency_satisfied('cplayer'):
         main_fn_c = ctx.pick_first_matching_dep([
-            ( "osdep/main-fn-cocoa.c",               "cocoa" ),
             ( "osdep/main-fn-unix.c",                "posix" ),
             ( "osdep/main-fn-win.c",                 "win32-desktop" ),
         ])
@@ -182,7 +181,6 @@ def build(ctx):
 
     timer_c = ctx.pick_first_matching_dep([
         ( "osdep/timer-win2.c",                  "os-win32" ),
-        ( "osdep/timer-darwin.c",                "os-darwin" ),
         ( "osdep/timer-linux.c",                 "posix" ),
     ])
 
@@ -206,13 +204,6 @@ def build(ctx):
         ( "audio/chmap_sel.c" ),
         ( "audio/decode/ad_lavc.c" ),
         ( "audio/decode/ad_spdif.c" ),
-        ( "audio/filter/af_drop.c" ),
-        ( "audio/filter/af_format.c" ),
-        ( "audio/filter/af_lavcac3enc.c" ),
-        ( "audio/filter/af_rubberband.c",        "rubberband" ),
-        ( "audio/filter/af_scaletempo.c" ),
-        ( "audio/filter/af_scaletempo2.c" ),
-        ( "audio/filter/af_scaletempo2_internals.c" ),
         ( "audio/fmt-conversion.c" ),
         ( "audio/format.c" ),
         ( "audio/out/ao.c" ),
@@ -246,7 +237,6 @@ def build(ctx):
         ( "demux/demux_disc.c" ),
         ( "demux/demux_edl.c" ),
         ( "demux/demux_lavf.c" ),
-        ( "demux/demux_libarchive.c",            "libarchive" ),
         ( "demux/demux_mf.c" ),
         ( "demux/demux_mkv.c" ),
         ( "demux/demux_mkv_timeline.c" ),
@@ -258,21 +248,6 @@ def build(ctx):
         ( "demux/packet.c" ),
         ( "demux/timeline.c" ),
 
-        ( "filters/f_async_queue.c" ),
-        ( "filters/f_autoconvert.c" ),
-        ( "filters/f_auto_filters.c" ),
-        ( "filters/f_decoder_wrapper.c" ),
-        ( "filters/f_demux_in.c" ),
-        ( "filters/f_hwtransfer.c" ),
-        ( "filters/f_lavfi.c" ),
-        ( "filters/f_output_chain.c" ),
-        ( "filters/f_swresample.c" ),
-        ( "filters/f_swscale.c" ),
-        ( "filters/f_utils.c" ),
-        ( "filters/filter.c" ),
-        ( "filters/frame.c" ),
-        ( "filters/user_filters.c" ),
-
         ## Input
         ( "input/cmd.c" ),
         ( "input/event.c" ),
@@ -280,13 +255,11 @@ def build(ctx):
         ( "input/ipc.c" ),
         ( ipc_c ),
         ( "input/keycodes.c" ),
-        ( "input/sdl_gamepad.c",                 "sdl2-gamepad" ),
 
         ## Misc
         ( "misc/bstr.c" ),
         ( "misc/charset_conv.c" ),
         ( "misc/dispatch.c" ),
-        ( "misc/jni.c",                          "android" ),
         ( "misc/json.c" ),
         ( "misc/natural_sort.c" ),
         ( "misc/node.c" ),
@@ -311,9 +284,7 @@ def build(ctx):
         ( "player/command.c" ),
         ( "player/configfiles.c" ),
         ( "player/external_files.c" ),
-        ( "player/javascript.c",                 "javascript" ),
         ( "player/loadfile.c" ),
-        ( "player/lua.c",                        "lua" ),
         ( "player/main.c" ),
         ( "player/misc.c" ),
         ( "player/osd.c" ),
@@ -325,20 +296,14 @@ def build(ctx):
 
         ## Streams
         ( "stream/cookies.c" ),
-        ( "stream/dvb_tune.c",                   "dvbin" ),
         ( "stream/stream.c" ),
         ( "stream/stream_avdevice.c" ),
-        ( "stream/stream_bluray.c",              "libbluray" ),
         ( "stream/stream_cb.c" ),
-        ( "stream/stream_cdda.c",                "cdda" ),
         ( "stream/stream_concat.c" ),
         ( "stream/stream_slice.c" ),
-        ( "stream/stream_dvb.c",                 "dvbin" ),
-        ( "stream/stream_dvdnav.c",              "dvdnav" ),
         ( "stream/stream_edl.c" ),
         ( "stream/stream_file.c" ),
         ( "stream/stream_lavf.c" ),
-        ( "stream/stream_libarchive.c",          "libarchive" ),
         ( "stream/stream_memory.c" ),
         ( "stream/stream_mf.c" ),
         ( "stream/stream_null.c" ),
