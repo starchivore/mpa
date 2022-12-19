@@ -94,7 +94,7 @@ if [ ! -e "$prefix_dir/lib/libavcodec.dll.a" ]; then
     ../configure --pkg-config=pkg-config --target-os=mingw32 \
         --enable-cross-compile --cross-prefix=$TARGET- --arch=${TARGET%%-*} \
         $commonflags \
-        --disable-{doc,programs,muxers,encoders,devices}
+        --disable-{doc,debug,avdevice,swscale,programs,network,muxers,zlib,bzlib,iconv,bsfs,indevs,outdevs,encoders,hwaccels,nvenc,videotoolbox,audiotoolbox,postproc,vulkan,mediafoundation,pic}
     makeplusinstall
     popd
 fi
