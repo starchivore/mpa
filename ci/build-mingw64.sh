@@ -200,96 +200,14 @@ rm -rf build
 if [ "$1" = "meson" ]; then
     meson setup build --cross-file "$prefix_dir/crossfile" \
         --buildtype debugoptimized \
-        -D{libmpv,tests}=false
+        -D{libmpv,build-date,tests,ta-leak-report}=false -Dlua=disabled \
+        -D{cdda,cplugins,dvbin,dvdnav,iconv,javascript,lcms2,libarchive,libavdevice,libbluray,pthread-debug,rubberband,sdl2,sdl2-gamepad,stdatomic,ucharset,uwp,vapoursynth,vector,win32-internal-pthreads,zimg,zlib,alsa,audiounit,coreaudio,jack,openal,opensles,oss-audio,pipewire,pulse,sdl2-audio,sndio,caca,cocoa,d3d11,direct3d,drm,egl,egl-android,egl-angle,egl-angle-lib,egl-angle-win32,egl-drm,egl-wayland,egl-x11,gbm,gl,gl-cocoa,gl-dxinterop,gl-win32,gl-x11,jpeg,libplacebo,rpi,sdl2-video,shaderc,sixel,spirv-cross,plain-gl,vdpau,vdpau-gl-x11,vaapi,vaapi-drm,vaapi-wayland,vaapi-x11,vaapi-x-egl,vulkan,wayland,x11,xv,android-media-ndk,cuda-hwaccel,cuda-interop,d3d-hwaccel,d3d9-hwaccel,gl-dxinterop-d3d9,ios-gl,rpi-mmal,videotoolbox-gl,macos-10-11-features,macos-10-12-2-features,macos-10-14-features,macos-cocoa-cb,macos-media-player,macos-touchbar,swift-build,swift-flags,html-build,manpage-build,pdf-build}=disabled
 
     ninja -C build --verbose
 elif [ "$1" = "waf" ]; then
     PKG_CONFIG=pkg-config ./waf configure \
-        --disable-android \
-        --disable-android-media-ndk \
-        --disable-tvos \
-        --disable-egl-android \
-        --disable-swift \
-        --disable-uwp \
-        --disable-stdatomic \
-        --disable-iconv \
-        --disable-lua \
-        --disable-javascript \
-        --disable-zlib \
-        --disable-libbluray \
-        --disable-dvdnav \
-        --disable-cdda \
-        --disable-uchardet \
-        --disable-rubberband \
-        --disable-zimg \
-        --disable-lcms2 \
-        --disable-vapoursynth \
-        --disable-libarchive \
-        --disable-dvbin \
-        --disable-sdl2 \
-        --disable-sdl2-gamepad \
-        --disable-sdl2-audio \
-        --disable-oss-audio \
-        --disable-pipewire \
-        --disable-sndio \
-        --disable-pulse \
-        --disable-jack \
-        --disable-openal \
-        --disable-opensles \
-        --disable-alsa \
-        --disable-coreaudio \
-        --disable-audiounit \
-        --disable-sdl2-video \
-        --disable-cocoa \
-        --disable-drm \
-        --disable-gbm \
-        --disable-wayland \
-        --disable-x11 \
-        --disable-xv \
-        --disable-gl-cocoa \
-        --disable-gl-x11 \
-        --disable-rpi \
-        --disable-egl \
-        --disable-egl-x11 \
-        --disable-egl-drm \
-        --disable-gl-wayland \
-        --disable-gl-win32 \
-        --disable-gl-dxinterop \
-        --disable-egl-angle \
-        --disable-egl-angle-lib \
-        --disable-egl-angle-win32 \
-        --disable-vdpau \
-        --disable-vdpau-gl-x11 \
-        --disable-vaapi \
-        --disable-vaapi-x11 \
-        --disable-vaapi-wayland \
-        --disable-vaapi-drm \
-        --disable-vaapi-x-egl \
-        --disable-caca \
-        --disable-jpeg \
-        --disable-direct3d \
-        --disable-shaderc \
-        --disable-spirv-cross \
-        --disable-d3d11 \
-        --disable-ios-gl \
-        --disable-plain-gl \
-        --disable-gl \
-        --disable-libplacebo \
-        --disable-vulkan \
-        --disable-sixel \
-        --disable-videotoolbox-gl \
-        --disable-d3d-hwaccel \
-        --disable-d3d9-hwaccel \
-        --disable-gl-dxinterop-d3d9 \
-        --disable-cuda-hwaccel \
-        --disable-cuda-interop \
-        --disable-rpi-mmal \
-        --disable-macos-touchbar \
-        --disable-macos-10-11-features \
-        --disable-macos-10-12-2-features \
-        --disable-macos-10-14-features \
-        --disable-macos-media-player \
-        --disable-macos-cocoa-cb
+        --enable-libmpv-shared --lua=luajit \
+        --enable-{shaderc,spirv-cross,d3d11,libplacebo,tests}
 
     ./waf build --verbose
 fi
